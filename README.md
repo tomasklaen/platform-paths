@@ -17,7 +17,7 @@ Cons:
 ## Install
 
 ```
-npm install platform-folders
+npm install platform-paths
 ```
 
 ## Usage
