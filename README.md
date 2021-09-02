@@ -1,4 +1,4 @@
-# platform-folders
+# platform-paths
 
 Retrieve platform specific paths such as `downloads`, `documents`, etc.
 
