@@ -2,6 +2,8 @@
 
 Retrieve platform specific paths such as `downloads`, `documents`, etc.
 
+Supports `linux`, `darwin`, and `win32` platforms.
+
 Pros:
 
 -   Tiny & simple.
