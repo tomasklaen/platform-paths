@@ -1,12 +1,12 @@
 {
 	"name": "platform-paths",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Retrieve paths to common media folders on each platform.",
 	"homepage": "https://github.com/tomasklaen/platform-paths",
 	"bugs": "https://github.com/tomasklaen/platform-paths/issues",
 	"repository": "github:tomasklaen/platform-paths",
 	"main": "dist/index.js",
-  "types": "dist/index.d.ts",
+	"types": "dist/index.d.ts",
 	"keywords": [
 		"platform",
 		"path",
