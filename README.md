@@ -37,30 +37,51 @@ const downloadsPath = await getDownloadsPath();
 Exported interfaces:
 
 ```ts
+interface Options {
+	maxAge?: number; // milliseconds, default: 0 (no caching)
+}
+
 // Name getter
-async function getPlatformPath(name: string): Promise<string>;
+async function getPlatformPath(name: string, options?: Options): Promise<string>;
 
 // Individual getters
-async function getTmpPath(): Promise<string>;
-async function getHomePath(): Promise<string>;
-async function getDownloadsPath(): Promise<string>;
-async function getDocumentsPath(): Promise<string>;
-async function getPicturesPath(): Promise<string>;
-async function getMusicPath(): Promise<string>;
-async function getVideosPath(): Promise<string>;
-async function getDesktopPath(): Promise<string>;
+async function getTmpPath(options?: Options): Promise<string>;
+async function getHomePath(options?: Options): Promise<string>;
+async function getDownloadsPath(options?: Options): Promise<string>;
+async function getDocumentsPath(options?: Options): Promise<string>;
+async function getPicturesPath(options?: Options): Promise<string>;
+async function getMusicPath(options?: Options): Promise<string>;
+async function getVideosPath(options?: Options): Promise<string>;
+async function getDesktopPath(options?: Options): Promise<string>;
 
 // Individual getters as a map
 const platformPaths = {
-	tmp: () => Promise<string>,
-	home: () => Promise<string>,
-	downloads: () => Promise<string>,
-	documents: () => Promise<string>,
-	pictures: () => Promise<string>,
-	music: () => Promise<string>,
-	videos: () => Promise<string>,
-	desktop: () => Promise<string>,
+	tmp: (options?: Options) => Promise<string>,
+	home: (options?: Options) => Promise<string>,
+	downloads: (options?: Options) => Promise<string>,
+	documents: (options?: Options) => Promise<string>,
+	pictures: (options?: Options) => Promise<string>,
+	music: (options?: Options) => Promise<string>,
+	videos: (options?: Options) => Promise<string>,
+	desktop: (options?: Options) => Promise<string>,
 };
+
+// Manual cache clearing
+function clearCache(): void;
+```
+
+### Caching
+
+On linux, we are using `xdg-user-dir`, and on windows `reg query` utils to retrieve paths. These are not _instant_, so if you're calling this a lot, you might want to enable caching.
+
+This is done by simply passing a `maxAge` option to any of the exported methods. This options is `0` by default (caching disabled):
+
+```js
+// Re-queries when older than 10 seconds
+const downloadsPath = getPlatformPath('downloads', {maxAge: 10_000});
+
+// Only queries 1st time, then always cached
+const downloadsPath = getDownloadsPath({maxAge: Infinity});
 ```
 
 ## License
