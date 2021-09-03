@@ -31,7 +31,7 @@ export async function getPlatformPath(name: string, {maxAge = 0}: Options = {}):
 
 	// Attempt to resolve from cached map
 	const cached = cachedPaths.get(name);
-	if (cached && (Date.now() - cached.createdAt) < maxAge) return cached.value;
+	if (cached && Date.now() - cached.createdAt < maxAge) return cached.value;
 
 	// Retrieve the value
 	const value = await getters[name]();
@@ -90,8 +90,7 @@ async function getLinuxPath(xdgName: string, folderName: string, fallback?: stri
 
 	try {
 		const path = `${homeDir}/${folderName}`;
-		await FSP.access(path);
-		return path;
+		if ((await FSP.stat(path)).isDirectory()) return path;
 	} catch {}
 
 	if (fallback) return fallback;
