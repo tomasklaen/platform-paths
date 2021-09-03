@@ -27,7 +27,7 @@ const getters = {
 };
 
 export async function getPlatformPath(name: string, {maxAge = 0}: Options = {}): Promise<string> {
-	if (!isPathIdentifier(name)) throw new Error(`Unknown platform path identifier "${name}".`);
+	if (!isPlatformPathIdentifier(name)) throw new Error(`Unknown platform path identifier "${name}".`);
 
 	// Attempt to resolve from cached map
 	const cached = cachedPaths.get(name);
@@ -64,7 +64,7 @@ export function clearCache() {
 	cachedPaths.clear();
 }
 
-function isPathIdentifier(name: string): name is keyof typeof getters {
+export function isPlatformPathIdentifier(name: string): name is keyof typeof getters {
 	return getters.hasOwnProperty(name);
 }
 
