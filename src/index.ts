@@ -4,15 +4,50 @@ import {promises as FSP} from 'fs';
 import {promisify} from 'util';
 
 const exec = promisify(CP.exec);
+const cachedPaths = new Map<string, CachedPath>();
 
-export const getTmpPath = async () => OS.tmpdir();
-export const getHomePath = async () => OS.homedir();
-export const getDownloadsPath = () => getPath('Downloads', 'Downloads', 'DOWNLOAD', 'Downloads', '/tmp/');
-export const getDocumentsPath = () => getPath('Personal', 'Documents', 'DOCUMENTS', 'Documents');
-export const getPicturesPath = () => getPath('My Pictures', 'Pictures', 'PICTURES', 'Pictures');
-export const getMusicPath = () => getPath('My Music', 'Music', 'MUSIC', 'Music');
-export const getVideosPath = () => getPath('My Video', 'Videos', 'VIDEOS', 'Videos');
-export const getDesktopPath = () => getPath('Desktop', 'Desktop', 'DESKTOP', 'Desktop');
+interface CachedPath {
+	value: string;
+	createdAt: number;
+}
+
+export interface Options {
+	maxAge?: number;
+}
+
+const getters = {
+	tmp: async () => OS.tmpdir(),
+	home: async () => OS.homedir(),
+	downloads: () => getPath('Downloads', 'Downloads', 'DOWNLOAD', 'Downloads', '/tmp/'),
+	documents: () => getPath('Personal', 'Documents', 'DOCUMENTS', 'Documents'),
+	pictures: () => getPath('My Pictures', 'Pictures', 'PICTURES', 'Pictures'),
+	music: () => getPath('My Music', 'Music', 'MUSIC', 'Music'),
+	videos: () => getPath('My Video', 'Videos', 'VIDEOS', 'Videos'),
+	desktop: () => getPath('Desktop', 'Desktop', 'DESKTOP', 'Desktop'),
+};
+
+export async function getPlatformPath(name: string, {maxAge = 0}: Options = {}): Promise<string> {
+	if (!isPathIdentifier(name)) throw new Error(`Unknown platform path identifier "${name}".`);
+
+	// Attempt to resolve from cached map
+	const cached = cachedPaths.get(name);
+	if (cached && (Date.now() - cached.createdAt) < maxAge) return cached.value;
+
+	// Retrieve the value
+	const value = await getters[name]();
+	cachedPaths.set(name, {value, createdAt: Date.now()});
+
+	return value;
+}
+
+export const getTmpPath = (options?: Options) => getPlatformPath('tmp', options);
+export const getHomePath = (options?: Options) => getPlatformPath('home', options);
+export const getDownloadsPath = (options?: Options) => getPlatformPath('downloads', options);
+export const getDocumentsPath = (options?: Options) => getPlatformPath('documents', options);
+export const getPicturesPath = (options?: Options) => getPlatformPath('pictures', options);
+export const getMusicPath = (options?: Options) => getPlatformPath('music', options);
+export const getVideosPath = (options?: Options) => getPlatformPath('videos', options);
+export const getDesktopPath = (options?: Options) => getPlatformPath('desktop', options);
 
 export const platformPaths = {
 	tmp: getTmpPath,
@@ -25,13 +60,12 @@ export const platformPaths = {
 	desktop: getDesktopPath,
 };
 
-function isPathIdentifier(name: string): name is keyof typeof platformPaths {
-	return platformPaths.hasOwnProperty(name);
+export function clearCache() {
+	cachedPaths.clear();
 }
 
-export function getPlatformPath(name: string) {
-	if (isPathIdentifier(name)) return platformPaths[name]();
-	throw new Error(`Unknown platform path identifier "${name}".`);
+function isPathIdentifier(name: string): name is keyof typeof getters {
+	return getters.hasOwnProperty(name);
 }
 
 async function getPath(winName: string, darwinName: string, xdgName: string, linuxName: string, linuxBackup?: string) {
