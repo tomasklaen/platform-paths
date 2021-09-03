@@ -9,6 +9,7 @@ Pros:
 -   Tiny & simple.
 -   No dependencies.
 -   No native modules, bindings, or binaries.
+-   Built in caching.
 
 Cons:
 
@@ -65,6 +66,10 @@ const platformPaths = {
 	videos: (options?: Options) => Promise<string>,
 	desktop: (options?: Options) => Promise<string>,
 };
+
+// Checks if string is a platform path identifier
+// (one of platformPaths keys)
+function isPlatformPathIdentifier(name: string): name is keyof typeof platformPaths;
 
 // Manual cache clearing
 function clearCache(): void;
