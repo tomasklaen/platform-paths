@@ -108,8 +108,19 @@ async function getWinRegistryPath(name: string) {
 
 	if (stderr) throw new Error(stderr);
 
-	const match = new RegExp(`^ *${key} +REG_EXPAND_SZ +(?<value>.*)$`, 'i').exec(stderr);
-	const value = match?.groups?.value;
+	let value: string | undefined;
+
+	for (const line of stdout.split('\r\n').map(line => line.trim())) {
+		if (!line.startsWith(key)) continue;
+
+		const parts = line.split(/ +REG_EXPAND_SZ +/);
+		if (parts.length === 2) {
+			value = parts[1];
+			break;
+		} else {
+			throw new Error(`Unexpected registry output:\n${line}`);
+		}
+	}
 
 	if (!value) {
 		// Special case for downloads folder
