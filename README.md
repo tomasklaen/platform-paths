@@ -1,8 +1,16 @@
 # platform-paths
 
-Retrieve platform specific paths such as `downloads`, `documents`, etc.
+Retrieve platform specific paths to user folders such as `downloads`, `documents`, etc.
 
 Supports `linux`, `darwin`, and `win32` platforms.
+
+Available paths: `tmp`, `home`, `downloads`, `documents`, `pictures`, `music`, `videos`, `desktop`.
+
+Retrieval methods:
+
+-   Linux: uses `xdg-user-dir` with a fallback to standard path names.
+-   Windows: uses `reg query` to retrieve and parse out the paths with a fallback to standard path names.
+-   macOS: simply constructs the standard path, as afaik these don't change on mac.
 
 Pros:
 
@@ -77,7 +85,7 @@ function clearCache(): void;
 
 ### Caching
 
-On linux, we are using `xdg-user-dir`, and on windows `reg query` utils to retrieve paths. These are not _instant_, so if you're calling this a lot, you might want to enable caching.
+The retrieval methods for these paths are not _instant_, so if you're calling this a lot, you might want to enable caching.
 
 This is done by simply passing a `maxAge` option to any of the exported methods. This options is `0` by default (caching disabled):
 
