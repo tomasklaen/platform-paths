@@ -1,6 +1,6 @@
 {
 	"name": "platform-paths",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "Retrieve paths to common media folders on each platform.",
 	"homepage": "https://github.com/tomasklaen/platform-paths",
 	"bugs": "https://github.com/tomasklaen/platform-paths/issues",
